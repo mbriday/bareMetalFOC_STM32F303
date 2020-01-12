@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 #project name
-project(2_serial)
+project(2_blinkInt)
 
 #application sources
 set(SRCS
