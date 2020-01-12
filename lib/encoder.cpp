@@ -1,6 +1,8 @@
 #include "encoder.h"
 #include "stm32f3xx.h"
 
+encoder Encoder;
+
 encoder::encoder()
 {
     //use TIM2 encoder function
@@ -30,11 +32,15 @@ encoder::encoder()
     TIM2->CCER  |= TIM_CCER_CC1P;			//invert TIM2_CH1 polarity (sense)
     TIM2->SMCR  |= 3 << TIM_SMCR_SMS_Pos;	//encoder mode: SMS=011 (mode x4)
     TIM2->CR1   |= TIM_CR1_CEN;				//config reg : enable
+
 }
-
-
 
 int32_t encoder::getValue()
 {
     return (int32_t)(TIM2->CNT);
+}
+
+void encoder::setValue(int32_t val)
+{
+    TIM2->CNT = val;
 }

@@ -1,4 +1,8 @@
 
+#Qt Creator build directories
+build-*
+_build
+
 #CMake QtCreator user file
 CMakeLists.txt.user
 

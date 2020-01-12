@@ -12,7 +12,6 @@ void wait()
 /* main function */
 int main(void)
 {
-    encoder Encoder;
 	/* Infinite loop */
 	while (1)
 	{
