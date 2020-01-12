@@ -14,6 +14,7 @@ set(LIBSRCS
     ${LIB_DIR}/pinAccess.c
     ${LIB_DIR}/spi.c
 	${LIB_DIR}/serial.cpp
+	${LIB_DIR}/encoder.cpp
 )
 
 set(APP_SRCS ${SRCS} ${LIBSRCS})

@@ -33,7 +33,8 @@ serial::serial()
 
     USART2->CR2 = 0; //default
     USART2->CR3 = 0; //default
-    USART2->BRR = (640000/1152) >> 1; //115200 bauds
+    //APB1 clock is 32MHz
+    USART2->BRR = (320000/1152); //115200 bauds
     USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
     NVIC_EnableIRQ(USART2_IRQn);
 }

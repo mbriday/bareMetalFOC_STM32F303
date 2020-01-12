@@ -141,7 +141,7 @@ void USART2_IRQHandler			(void) __attribute__ ((weak, alias("Default_Handler")))
 void USART3_IRQHandler			(void) __attribute__ ((weak, alias("Default_Handler")));
 void EXTI15_10_IRQHandler		(void) __attribute__ ((weak, alias("Default_Handler")));
 void RTC_Alarm_IRQHandler		(void) __attribute__ ((weak, alias("Default_Handler")));
-void TIM6_DAC1_IRQHandler		(void) __attribute__ ((weak, alias("Default_Handler")));
+void TIM6_DAC_IRQHandler		(void) __attribute__ ((weak, alias("Default_Handler")));
 void TIM7_DAC2_IRQHandler		(void) __attribute__ ((weak, alias("Default_Handler")));
 void COMP2_IRQHandler			(void) __attribute__ ((weak, alias("Default_Handler")));
 void COMP4_6_IRQHandler			(void) __attribute__ ((weak, alias("Default_Handler")));
@@ -224,7 +224,7 @@ extern const pFunc __Vectors[240];
 	0,
 	0,
 	0,
-	TIM6_DAC1_IRQHandler,
+    TIM6_DAC_IRQHandler,
 	TIM7_DAC2_IRQHandler,
 	0,
 	0,
