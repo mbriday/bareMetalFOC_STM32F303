@@ -16,9 +16,9 @@ void svpwm::begin()
 
     //Ok, configure the pwm:
     //These are alternate functions
-    pinAltFunction(IN_PORT,INU_PIN,AFR_INU);
-    pinAltFunction(IN_PORT,INV_PIN,AFR_INV);
-    pinAltFunction(IN_PORT,INW_PIN,AFR_INW);
+    pinAlt(IN_PORT,INU_PIN,AFR_INU);
+    pinAlt(IN_PORT,INV_PIN,AFR_INV);
+    pinAlt(IN_PORT,INW_PIN,AFR_INW);
 
     //we deal with timer TIM1 only
     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
