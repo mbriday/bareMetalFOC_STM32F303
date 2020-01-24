@@ -3,7 +3,7 @@
 
 void clockForGpio(GPIO_TypeDef *port)
 {
-	if(port == GPIOA) RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    if(port == GPIOA)      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	else if(port == GPIOB) RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
 	else if(port == GPIOC) RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
 	else if(port == GPIOD) RCC->AHBENR |= RCC_AHBENR_GPIODEN;
@@ -87,4 +87,33 @@ unsigned char digitalRead(GPIO_TypeDef *port,
 	if(port->IDR & (1U<<numBit)) //if is set
 		return 1;
 	return 0;
+}
+
+unsigned char pinAlt(GPIO_TypeDef *port,
+                     unsigned char numBit,
+                     unsigned char AFId)
+{
+    if(!IS_GPIO_ALL_INSTANCE(port)) return 0xFF;
+    if(numBit > 15) return 0xFF;
+    if(AFId > 15) return 0xFF;
+    //clock
+    clockForGpio(port);
+    //set MODER to 10
+    int32_t mask2Bits = (3U << (numBit*2));
+    port->MODER &= ~mask2Bits;
+    port->MODER |= (2U<<(numBit*2));
+    //set alternate function
+    uint32_t shift;
+    int AFRReg;
+    if(numBit < 8) //AFRL
+    {
+        shift = numBit<<2;
+        AFRReg = 0;
+    } else { //AFRH
+        shift = (numBit-8)<<2;
+        AFRReg = 1;
+    }
+    port->AFR[AFRReg] &= ~(0xf<<shift);
+    port->AFR[AFRReg] |=  (AFId<<shift);
+    return 0;
 }

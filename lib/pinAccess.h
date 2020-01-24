@@ -14,34 +14,48 @@
 #define INPUT_PULLUP   3
 #define INPUT_PULLDOWN 4
 
-//configure a pin
-// - port is GPIOA, GPIOB, ...
-// - numBit is the pin number (0 to 15)
-// - mode is in DISABLE, OUTPUT, INPUT, ...)
+/* configure a pin
+ * - port is GPIOA, GPIOB, ...
+ * - numBit is the pin number (0 to 15)
+ * - mode is in DISABLE, OUTPUT, INPUT, ...)
+ */
 int pinMode(GPIO_TypeDef *port, 
             unsigned char numBit,
             unsigned char mode);
 
-//set a pin, previously configured as OUTPUT
-// high state if 'value' is different from 0
-// low state if 'value' is 0.
+/* set a pin, previously configured as OUTPUT
+ * high state if 'value' is different from 0
+ * low state if 'value' is 0.
+ */
 void digitalWrite(GPIO_TypeDef *port, 
                   unsigned char numBit,
                   unsigned int value);
 
-//toggle output state of a pin
-// 0 => 1
-// 1 => 0
+/* toggle output state of a pin
+ * 0 => 1
+ * 1 => 0
+ */
 void digitalToggle(GPIO_TypeDef *port, 
                   unsigned char numBit);
 
-//read the state of a pin, previously configured as input.
-//returns
-// - 0xFF in case of error (bad arguments)
-// - 0 or 1, depending on pin state.
+
+/* read the state of a pin, previously configured as input.
+ * returns
+ * - 0xFF in case of error (bad arguments)
+ * - 0 or 1, depending on pin state.
+ */
 unsigned char digitalRead(GPIO_TypeDef *port,
                           unsigned char numBit);
 
+/* Activate the alternate function in parameter for the
+ * pin.
+ * \param AFId the alternate function id, between 0 and 15
+ * \return
+ * - 0xFF in case of error (bad arguments)
+ */
+unsigned char pinAlt(GPIO_TypeDef *port,
+                     unsigned char numBit,
+                     unsigned char AFId);
 
 #ifdef __cplusplus
   }

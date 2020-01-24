@@ -12,7 +12,6 @@ project(4_motorFindZero)
 #application sources
 set(SRCS
 	    ${CMAKE_SOURCE_DIR}/main.cpp
-		${CMAKE_SOURCE_DIR}/encoder.cpp
 )
 
 include("../sys/cmake/labs.cmake")
