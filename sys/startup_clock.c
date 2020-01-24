@@ -15,7 +15,7 @@ void SystemInit()
 	// Must set flash latency (2 wait states): F>48MHz
 	FLASH->ACR |= 2 << FLASH_ACR_LATENCY_Pos ; // add two wait states
 	
-	//clock on APB1/2 => max 36MHz
+    //clock on APB1 => max 36MHz
 	//not divided for timers TIMx
 	RCC->CFGR |= 4 << RCC_CFGR_PPRE1_Pos; 
 

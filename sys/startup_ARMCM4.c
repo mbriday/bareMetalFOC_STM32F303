@@ -35,6 +35,8 @@
 //  #error device not specified!
 //#endif
 #include <stdint.h>
+#include "stm32f3xx.h"
+#include "core_cm4.h"
 
 /*----------------------------------------------------------------------------
   Linker generated Symbols
@@ -260,29 +262,33 @@ void SystemInit();
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
 void Reset_Handler(void) {
-  uint32_t *pSrc, *pDest;
+    uint32_t *pSrc, *pDest;
 
-/* Firstly it copies data from read only memory to RAM.
- *
- */
-  pSrc  = &__etext;
-  pDest = &__data_start__;
-  while( pDest < &__data_end__ ) *pDest++ = *pSrc++;
+    /* Firstly it copies data from read only memory to RAM.
+     *
+     */
+    pSrc  = &__etext;
+    pDest = &__data_start__;
+    while( pDest < &__data_end__ ) *pDest++ = *pSrc++;
 
-/* This part of work usually is done in C library startup code.
- * Otherwise, define this macro to enable it in this startup.
- *
- * The BSS section is specified by following symbols
- *   __bss_start__: start of the BSS section.
- *   __bss_end__: end of the BSS section.
- *
- * Both addresses must be aligned to 4 bytes boundary.
- */
-  pDest = &__bss_start__;
-  while(pDest < &__bss_end__ ) *pDest++ = 0UL;
+    /* This part of work usually is done in C library startup code.
+     * Otherwise, define this macro to enable it in this startup.
+     *
+     * The BSS section is specified by following symbols
+     *   __bss_start__: start of the BSS section.
+     *   __bss_end__: end of the BSS section.
+     *
+     * Both addresses must be aligned to 4 bytes boundary.
+     */
+    pDest = &__bss_start__;
+    while(pDest < &__bss_end__ ) *pDest++ = 0UL;
 
-  SystemInit();                             /* CMSIS System Initialization */
-  _start();                                 /* Enter PreeMain (C library entry point) */
+#ifdef __FPU_PRESENT
+    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+#endif
+
+    SystemInit();                             /* CMSIS System Initialization */
+    _start();                                 /* Enter PreeMain (C library entry point) */
 }
 
 
