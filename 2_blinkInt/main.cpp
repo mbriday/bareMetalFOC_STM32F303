@@ -4,7 +4,7 @@
 
 void setup()
 {
-    pinMode(GPIOA,5,OUTPUT);
+    pinMode(GPIOA,5,OUTPUT); /* user led */
 
     //start TIM6
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
