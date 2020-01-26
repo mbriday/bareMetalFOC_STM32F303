@@ -37,6 +37,11 @@ public:
      * @param fieldwidth defines the minimal string length (spaces added)
      */
     void printInt(int32_t val, int base=10, int fieldWidth=1);
+
+	/* waiting loop to re-synchronise output on Serial.
+	 * mainly for debug purpose
+	 */
+	void waitForTXComplete();
 };
 
 extern serial Serial; //serial USART2 over USB

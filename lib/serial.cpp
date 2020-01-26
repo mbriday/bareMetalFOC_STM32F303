@@ -20,8 +20,8 @@ serial::serial()
     GPIOA->OTYPER |= GPIO_OTYPER_OT_3;              //open drain
     GPIOA->AFR[0] |= 7 << GPIO_AFRL_AFRL2_Pos;      //alternate func is AF1
     GPIOA->AFR[0] |= 7 << GPIO_AFRL_AFRL3_Pos;      //alternate func is AF1
-    GPIOA->MODER  &= ~(3 << GPIO_MODER_MODER2_Pos); //reset PA2 config
-    GPIOA->MODER  &= ~(3 << GPIO_MODER_MODER3_Pos); //reset PA3 config
+    GPIOA->MODER  &= ~(3U << GPIO_MODER_MODER2_Pos); //reset PA2 config
+    GPIOA->MODER  &= ~(3U << GPIO_MODER_MODER3_Pos); //reset PA3 config
     GPIOA->MODER  |= 2 << GPIO_MODER_MODER2_Pos;    //alternate function
     GPIOA->MODER  |= 2 << GPIO_MODER_MODER3_Pos;    //alternate function
 
@@ -94,8 +94,8 @@ void serial::printInt(int32_t val, int base, int fieldWidth)
         {
             char digit;
             int remaining = val % base;
-            if(remaining<10) digit = (char)remaining + '0';
-            else digit=(char)remaining-10+'A';
+            if(remaining<10) digit = (char)(remaining + (int)'0');
+            else digit=(char)(remaining-10+(int)'A');
             buffer[index++] = digit;
             val = val / base;
         }
@@ -107,4 +107,12 @@ void serial::printInt(int32_t val, int base, int fieldWidth)
     {
         printchar(buffer[i]);
     }
+}
+
+void serial::waitForTXComplete()
+{
+    /* The TX Interrupt is disabled when the TX buffer
+     * is empty.
+     */
+    while(USART2->CR1 & USART_CR1_TXEIE);
 }
