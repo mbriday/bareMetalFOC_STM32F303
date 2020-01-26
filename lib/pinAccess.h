@@ -54,8 +54,8 @@ unsigned char digitalRead(GPIO_TypeDef *port,
  * - 0xFF in case of error (bad arguments)
  */
 unsigned char pinAlt(GPIO_TypeDef *port,
-                     unsigned char numBit,
-                     unsigned char AFId);
+                     uint32_t numBit,
+                     uint32_t AFId);
 
 #ifdef __cplusplus
   }
