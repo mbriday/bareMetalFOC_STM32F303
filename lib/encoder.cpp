@@ -1,5 +1,6 @@
-#include "encoder.h"
 #include "stm32f3xx.h"
+#include "encoder.h"
+#include "pinAccess.h"
 
 encoder Encoder;
 
@@ -10,16 +11,11 @@ encoder::encoder()
     // TIM2_CH2 is PB3 (pin 31 - connector ST-Morpho CN10)
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN;  //clock for GPIOA,B
     __asm("nop");                       //wait until GPIOA,B clock are Ok.
+
     //TIM2_CH1 and TIM2_CH2 are alternate function AF1
     //p.40 of datasheet (physical part)
-    GPIOA->OTYPER |= GPIO_OTYPER_OT_0;               //open drain
-    GPIOB->OTYPER |= GPIO_OTYPER_OT_3;               //open drain
-    GPIOA->AFR[0] |= 1U << GPIO_AFRL_AFRL0_Pos;      //alternate func is AF1
-    GPIOB->AFR[0] |= 1U << GPIO_AFRL_AFRL3_Pos;      //alternate func is AF1
-    GPIOA->MODER  &= ~(3U << GPIO_MODER_MODER0_Pos); //reset PA5 config
-    GPIOB->MODER  &= ~(3U << GPIO_MODER_MODER3_Pos); //reset PB3 config
-    GPIOA->MODER  |= 2U << GPIO_MODER_MODER0_Pos;    //alternate function
-    GPIOB->MODER  |= 2U << GPIO_MODER_MODER3_Pos;    //alternate function
+    pinAlt(GPIOA,0,1);
+    pinAlt(GPIOB,3,1);
 
     //input clock = 64MHz. Required?
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;

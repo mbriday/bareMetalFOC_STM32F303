@@ -12,6 +12,7 @@ svpwmTester::svpwmTester()
  * The initial goal is ~600 rpm, each degree.
  * => 600/60 = 10 round/s
  * => 10*360 => 3600 Hz
+ * NOTE: 7 pole pair for the magnet => SPEED/7!
  * If we get PSC= 64-1  => 1us
  *           ARR= 278-1 => 3597Hz
 **/
