@@ -2,10 +2,10 @@
 set(CPU_OPTIONS -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DSTM32F303xE -DARMCM4)
 #set(CPU_OPTIONS -mthumb -mcpu=cortex-m4 -mfloat-abi=soft -DSTM32F303xE -DARMCM4)
 
-set(CMAKE_C_FLAGS_DEBUG   "-O0 -g -Wall -fexceptions -Wno-deprecated -DDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wall -fexceptions -Wno-deprecated -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE   "-O3 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -pipe -ffast-math -fexceptions -flto")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -pipe -ffast-math -fexceptions -flto")
+set(CMAKE_C_FLAGS_DEBUG   "-O0 -g -Wno-deprecated -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wno-deprecated -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE   "-O3 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -pipe") #-ffast-math -flto")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -pipe") #-ffast-math -flto")
 
 #compiler options
 add_compile_options(
@@ -18,7 +18,7 @@ add_compile_options(
     $<$<COMPILE_LANGUAGE:CXX>:-fno-use-cxa-atexit>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
 	#$<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>   #Adafruit
-	#$<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override> #GFX does not support it
+	$<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
     -fstrict-volatile-bitfields
     -ffunction-sections
@@ -27,12 +27,13 @@ add_compile_options(
     -Wextra
     -Wcast-align
 	#-Wconversion
-    #-Wsign-conversion
+	#-Wsign-conversion
     -Wshadow
     -Wlogical-op
     -Wsuggest-final-types
     -Wsuggest-final-methods
-    #-pedantic
+	-pedantic
+	-fexceptions
 )
 
 include_directories(

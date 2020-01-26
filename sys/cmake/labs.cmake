@@ -15,6 +15,7 @@ set(LIBSRCS
     ${LIB_DIR}/spi.c
 	${LIB_DIR}/serial.cpp
 	${LIB_DIR}/encoder.cpp
+	${LIB_DIR}/fixmath.cpp
 )
 
 set(APP_SRCS ${SRCS} ${LIBSRCS})
