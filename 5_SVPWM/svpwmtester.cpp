@@ -1,7 +1,7 @@
-#include <math.h>
 #include "svpwmtester.h"
 #include "pinAccess.h"
 #include "stm32f3xx.h"
+#include "fixmath.h"
 
 svpwmTester::svpwmTester()
 {
@@ -45,26 +45,42 @@ void svpwmTester::setAmplitude(const unsigned int val)
     else mAmplitude = val;
 }
 
-void svpwmTester::update(const unsigned int angleDeg)
+void svpwmTester::update(const unsigned int angle)
 {
-    const float angleR = angleDeg*3.14159265/180;
-    mValpha = mAmplitude * cos(angleR);
-    mVbeta  = mAmplitude * sin(angleR);
+#ifdef __USE_PRECALCULATED_COS_TAB__
+    const uint32_t sc = sincos(angle);
+    const int16_t sinA = (int16_t)(sc >> 16);
+    const int16_t cosA = (int16_t)(sc & 0xFFFF);
+    mValpha = (mAmplitude * (cosA & 0xFFFF)) >> 15; /* as cos is in fix point 1.5 */
+    mVbeta  = (mAmplitude * (sinA >> 16   )) >> 15; /* as sin is in fix point 1.5 */
+#else
+    mValpha = (int16_t)((float)mAmplitude * cos((float)angle*3.14159f/512));
+    mVbeta  = (int16_t)((float)mAmplitude * sin((float)angle*3.14159f/512));
+#endif
 }
 
-unsigned int svpwmTester::getData()
+uint32_t svpwmTester::getData()
 {
-    return (mValpha<<16) | mVbeta;
+    return ((uint32_t)mValpha)<<16U | ((uint32_t)mVbeta & 0xFFFF);
 }
 
 /*
- * ~97 us with soft FPU   (+-2us)
- * ~27.6 us with soft FPU (stable) => 3.5x faster
+ * Test in debug mode:
+ *  - ~110  us with soft float
+ *  -  11.5 us with hard float ( x9.5 faster)
+ *  -   3.8 us with fix point  (x28.9 faster)
+ *  -   3.1 us with fix point and sincos (x35.7 faster)
+ *
+ * With Release mode (O3):
+ *  - ~80.4 us with soft float
+ *  -   5.1 us with hard float (x15.7 faster)
+ *  -   1.5 us with fix point  (x53.6 faster)
+ *  -   0.9 us with fix point and sincos (x89.3 faster)
  */
 extern "C" void TIM6_DAC_IRQHandler() {
-    static int degree = 0;
+    static unsigned int degree = 0;
     GPIOA->BSRR = 1 << 5;
-    degree = (degree+1) % 360;
+    degree = (degree+1) % 0x3FF; // modulo 1024
     SvpwmTester.update(degree);
     GPIOA->BSRR = 1 << (5+16);
     TIM6->SR &= ~TIM_SR_UIF;	//acknowledge

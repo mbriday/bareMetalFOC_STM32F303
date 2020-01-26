@@ -4,19 +4,20 @@
 #include "encoder.h"
 #include "svpwm.h"
 #include "svpwmtester.h"
+#include "fixmath.h"
 
 void setup()
 {
     //Svpwm.begin();
-    SvpwmTester.begin();
+    //SvpwmTester.begin();
 }
 
 /* main function */
 int main(void)
 {
     setup();
-	/* Infinite loop */
+    /* Infinite loop */
 	while (1)
 	{
-	}
+    }
 }

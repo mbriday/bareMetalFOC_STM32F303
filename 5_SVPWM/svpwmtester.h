@@ -1,5 +1,6 @@
 #ifndef SVPWMTESTER_H
 #define SVPWMTESTER_H
+#include <stdint.h>
 
 /* mode that computes the sin/cos for each degree in-line */
 #define WITHFLOAT
@@ -15,8 +16,8 @@
 class svpwmTester
 {
     unsigned int mAmplitude;
-    unsigned int mValpha;
-    unsigned int mVbeta;
+    int16_t mValpha;
+    int16_t mVbeta;
 public:
     svpwmTester();
     void begin();
@@ -30,7 +31,7 @@ public:
      * Valpha bits [31:16]
      * Vbeta  bits [15: 0]
      */
-    unsigned int getData();
+    uint32_t getData();
 };
 
 extern svpwmTester SvpwmTester;
