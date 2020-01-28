@@ -52,8 +52,11 @@ void svpwm::begin()
     //start timer.
     TIM1->CR1 |= TIM_CR1_CEN;
 
-    TIM1->DIER |= TIM_DIER_UIE;
-    NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
+    //TIM1->DIER |= TIM_DIER_UIE;
+    //NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
+    #ifdef DEBUG_SVPWM_SECTOR
+        pinMode(GPIOA,5,OUTPUT);
+    #endif
 }
 
 extern "C" void TIM1_UP_TIM16_IRQHandler()
@@ -82,4 +85,59 @@ void svpwm::disableOutputs()
     digitalWrite(EN_PORT,ENV_PIN,0);
     digitalWrite(EN_PORT,ENW_PIN,0);
     TIM1->BDTR &= ~TIM_BDTR_MOE; //main output disable
+}
+
+#ifdef DEBUG_SVPWM_SECTOR
+void svpwm::update(uint32_t ValphaBeta,unsigned int degree)
+#else
+void svpwm::update(uint32_t ValphaBeta)
+#endif
+{
+   const int16_t Valpha = (int16_t)(ValphaBeta >> 16);
+   const int16_t Vbeta  = (int16_t)(ValphaBeta & 0xFFFF);
+   const int16_t ValphaS3 = (int16_t)((Valpha * sqrt3) >> 14);
+   int sector = 0;
+
+   //ok, first search for the good sector:
+   if(Vbeta >= 0)
+   {
+       if(Valpha >= 0)
+       {
+           if(Vbeta - ValphaS3 <= 0) sector = 1;
+           else sector = 2;
+       } else {
+           if((Vbeta + ValphaS3) <= 0) sector = 3;
+           else sector = 2;
+       }
+   } else {
+       if(Valpha>= 0)
+       {
+           if(Vbeta + ValphaS3 <= 0) sector = 5;
+           else sector = 6;
+       } else {
+           if((Vbeta - ValphaS3) <= 0) sector = 5;
+           else sector = 4;
+       }
+   }
+
+#ifdef DEBUG_SVPWM_SECTOR
+   const unsigned int mod = degree % 1024;
+   bool fail = false;
+   switch(sector)
+   {
+        case 1: if(mod >  169             ) fail = true; break;
+        case 2: if(mod <= 169 || mod > 339) fail = true; break;
+        case 3: if(mod <= 339 || mod > 512) fail = true; break;
+        case 4: if(mod <= 512 || mod > 681) fail = true; break;
+        case 5: if(mod <= 681 || mod > 855) fail = true; break;
+        case 6: if(mod <= 855             ) fail = true; break;
+        default: fail = true;
+   }
+   if(fail)
+   {
+       GPIOA->BSRR = 1 << 5;
+   }
+#endif //DEBUG_SVPWM_SECTOR
+
+   //Ok, now, update the PWM duty cycles
 }

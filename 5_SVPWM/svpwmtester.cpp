@@ -2,6 +2,7 @@
 #include "pinAccess.h"
 #include "stm32f3xx.h"
 #include "fixmath.h"
+#include "svpwm.h"
 
 svpwmTester::svpwmTester()
 {
@@ -20,7 +21,6 @@ void svpwmTester::begin()
 {
     mAmplitude = 100; //10%
 
-    pinMode(GPIOA,5,OUTPUT); //user led
     //start TIM6@3597 HZ
     //input clock = 64MHz.
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
@@ -52,8 +52,8 @@ void svpwmTester::update(const unsigned int angle)
     const uint32_t sc = sincos(angle);
     const int16_t sinA = (int16_t)(sc >> 16);
     const int16_t cosA = (int16_t)(sc & 0xFFFF);
-    mValpha = (mAmplitude * (cosA & 0xFFFF)) >> 15; /* as cos is in fix point 1.5 */
-    mVbeta  = (mAmplitude * (sinA >> 16   )) >> 15; /* as sin is in fix point 1.5 */
+    mValpha = (mAmplitude * cosA) >> 15; /* as cos is in fix point 1.5 */
+    mVbeta  = (mAmplitude * sinA) >> 15; /* as sin is in fix point 1.5 */
 #else
     mValpha = (int16_t)((float)mAmplitude * cos((float)angle*3.14159f/512));
     mVbeta  = (int16_t)((float)mAmplitude * sin((float)angle*3.14159f/512));
@@ -80,10 +80,11 @@ uint32_t svpwmTester::getData()
  */
 extern "C" void TIM6_DAC_IRQHandler() {
     static unsigned int degree = 0;
-    GPIOA->BSRR = 1 << 5;
+    //GPIOA->BSRR = 1 << 5;
     degree = (degree+1) % 0x3FF; // modulo 1024
     SvpwmTester.update(degree);
-    GPIOA->BSRR = 1 << (5+16);
+    Svpwm.update(SvpwmTester.getData(),degree);
+    //GPIOA->BSRR = 1 << (5+16);
     TIM6->SR &= ~TIM_SR_UIF;	//acknowledge
 }
 

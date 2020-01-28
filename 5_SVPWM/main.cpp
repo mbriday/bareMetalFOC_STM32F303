@@ -8,8 +8,9 @@
 
 void setup()
 {
+    pinMode(GPIOA,5,OUTPUT); //user led
     //Svpwm.begin();
-    //SvpwmTester.begin();
+    SvpwmTester.begin();
 }
 
 /* main function */
