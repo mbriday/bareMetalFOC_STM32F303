@@ -83,7 +83,8 @@ extern "C" void TIM6_DAC_IRQHandler() {
     //GPIOA->BSRR = 1 << 5;
     degree = (degree+1) % 0x3FF; // modulo 1024
     SvpwmTester.update(degree);
-    Svpwm.update(SvpwmTester.getData(),degree);
+    //Svpwm.update(SvpwmTester.getData(),degree);
+    Svpwm.update(SvpwmTester.getData());
     //GPIOA->BSRR = 1 << (5+16);
     TIM6->SR &= ~TIM_SR_UIF;	//acknowledge
 }

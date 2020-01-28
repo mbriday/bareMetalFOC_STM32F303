@@ -96,7 +96,7 @@ void svpwm::update(uint32_t ValphaBeta)
    const int16_t Valpha = (int16_t)(ValphaBeta >> 16);
    const int16_t Vbeta  = (int16_t)(ValphaBeta & 0xFFFF);
    const int16_t ValphaS3 = (int16_t)((Valpha * sqrt3) >> 14);
-   int sector = 0;
+   int __attribute__((unused)) sector = 0;
 
    //ok, first search for the good sector:
    if(Vbeta >= 0)
@@ -140,4 +140,9 @@ void svpwm::update(uint32_t ValphaBeta)
 #endif //DEBUG_SVPWM_SECTOR
 
    //Ok, now, update the PWM duty cycles
+   //T0 is split between sectors 0 and 7 (no power)
+   //uint32_t Valpha2 = ((uint32_t)Valpha) * Valpha;
+   //uint32_t Vbeta2  = ((uint32_t)Vbeta ) * Vbeta;
+   //uint32_t norm2 = Valpha2+Vbeta2; //TODO: may overflow?
+
 }

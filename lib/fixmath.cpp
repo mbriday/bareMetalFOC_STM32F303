@@ -84,7 +84,22 @@ uint32_t sincos(int angle)
     }
 
 }
-#ifdef DEBUG
+
+
+uint16_t sqrt(uint32_t val,uint16_t init)
+{
+    uint16_t result = init;
+    for(int i=0;i<5;i++)
+    {
+        uint16_t newR = (result+val/result) >> 1;
+        //may need less loops.
+        if(newR == result) return newR;
+        else result = newR;
+    }
+    return result;
+}
+
+#ifdef DEBUG_FIX_MATH
 #include "serial.h"
 
 void debugFixMath()
@@ -92,10 +107,11 @@ void debugFixMath()
     const int amplitude = 1000;
     for(int i = 0;i<1024;i+=2)
     {
-        uint32_t sc = sincos(i);
-        const int16_t sinA = (int16_t)(sc >> 16);
+        //uint32_t sc = sincos(i);
+        //const int16_t sinA = (int16_t)(sc >> 16);
         //const int16_t cosA = (int16_t)(sc & 0xFFFF);
-        int16_t val = amplitude*sinA>>15;
+        //const int16_t val = amplitude*sinA>>15;
+        const int16_t val = sqrt(amplitude*i,30*(i>>2));
         Serial.printInt(val);
         Serial.printchar('\n');
         Serial.waitForTXComplete();
