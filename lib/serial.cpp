@@ -1,8 +1,14 @@
 #include "stm32f3xx.h"
+#include "pinAccess.h"
 #include "serial.h"
 
+extern "C" uint32_t getCPUFreq(); //get cpu clock.
 serial Serial;
 
+extern "C" void __io_putchar(char c)
+{
+    Serial.printchar(c);
+}
 /* USART2 is available through the ST-Link MCU to support a virtual COM port:
  * - PA2 (TX) => alternative config 7
  * - PA3 (RX) => alternative config 7
@@ -14,27 +20,21 @@ serial::serial()
     m_txBufHead = 0;
     m_txBufTail = 0;
 
-    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;              //clock for GPIOA
-    __asm("nop");                                   //wait until GPIOA clock is Ok.
-    GPIOA->OTYPER |= GPIO_OTYPER_OT_2;              //open drain
-    GPIOA->OTYPER |= GPIO_OTYPER_OT_3;              //open drain
-    GPIOA->AFR[0] |= 7 << GPIO_AFRL_AFRL2_Pos;      //alternate func is AF1
-    GPIOA->AFR[0] |= 7 << GPIO_AFRL_AFRL3_Pos;      //alternate func is AF1
-    GPIOA->MODER  &= ~(3U << GPIO_MODER_MODER2_Pos); //reset PA2 config
-    GPIOA->MODER  &= ~(3U << GPIO_MODER_MODER3_Pos); //reset PA3 config
-    GPIOA->MODER  |= 2 << GPIO_MODER_MODER2_Pos;    //alternate function
-    GPIOA->MODER  |= 2 << GPIO_MODER_MODER3_Pos;    //alternate function
+    pinAlt(GPIOA,2,7); // PA2 (TX) => alternative config 7
+    pinAlt(GPIOA,3,7); // PA3 (RX) => alternative config 7
 
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     __asm("nop");
     RCC->APB1RSTR |=  RCC_APB1RSTR_USART2RST;
     RCC->APB1RSTR &= ~RCC_APB1RSTR_USART2RST;
     __asm("nop");
+    //select SYSCLK (CPU freq) for USART2: 64 or 72MHz (see startup_clock.c)
+    RCC->CFGR3 &= ~RCC_CFGR3_USART2SW_Msk;
+    RCC->CFGR3 |=  RCC_CFGR3_USART2SW_0;
+    USART2->BRR = getCPUFreq()/115200; //115200 bauds
 
     USART2->CR2 = 0; //default
     USART2->CR3 = 0; //default
-    //APB1 clock is 32MHz
-    USART2->BRR = (320000/1152); //115200 bauds
     USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
     NVIC_EnableIRQ(USART2_IRQn);
 }

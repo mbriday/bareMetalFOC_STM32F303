@@ -41,16 +41,15 @@
 /*----------------------------------------------------------------------------
   Linker generated Symbols
  *----------------------------------------------------------------------------*/
-extern uint32_t __etext;
-extern uint32_t __data_start__;
-extern uint32_t __data_end__;
-extern uint32_t __copy_table_start__;
-extern uint32_t __copy_table_end__;
-extern uint32_t __zero_table_start__;
-extern uint32_t __zero_table_end__;
-extern uint32_t __bss_start__;
-extern uint32_t __bss_end__;
-extern uint32_t __StackTop;
+extern uint32_t _sidata;    //@ in flash where init global vars are stored
+extern uint32_t _sdata;     //start @ in RAM for global vars
+extern uint32_t _edata;     //end @ in RAM for global vars
+extern uint32_t __bss_start__;  //start @ in RAM for 0 init vars
+extern uint32_t __bss_end__;    //end @ in RAM for 0 init vars
+extern uint32_t _estack;        //top of stack
+extern uint32_t _siccmram;      //@ in flash for code that should be copied to ccmram
+extern uint32_t _sccmram ;      //start @ in ccmram (time critical code)
+extern uint32_t _eccmram ;      //end @ in ccmram
 
 
 /*----------------------------------------------------------------------------
@@ -153,8 +152,8 @@ void FPU_IRQHandler				(void) __attribute__ ((weak, alias("Default_Handler")));
   Exception / Interrupt Vector table
  *----------------------------------------------------------------------------*/
 extern const pFunc __Vectors[240];
-       const pFunc __Vectors[240] __attribute__ ((section(".vectors"))) = {
-	(pFunc)((int)(&__StackTop)),              /*     Initial Stack Pointer */
+       const pFunc __Vectors[240] __attribute__ ((section(".isr_vector"))) = {
+    (pFunc)((int)(&_estack)),                 /*     Initial Stack Pointer */
 	Reset_Handler,                            /*     Reset Handler */
 	NMI_Handler,                              /* -14 NMI Handler */
 	HardFault_Handler,                        /* -13 Hard Fault Handler */
@@ -258,6 +257,8 @@ extern const pFunc __Vectors[240];
 };
 
 void SystemInit();
+int main();
+void __libc_init_array();
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
@@ -267,9 +268,17 @@ void Reset_Handler(void) {
     /* Firstly it copies data from read only memory to RAM.
      *
      */
-    pSrc  = &__etext;
-    pDest = &__data_start__;
-    while( pDest < &__data_end__ ) *pDest++ = *pSrc++;
+    pSrc  = &_sidata;
+    pDest = &_sdata;
+    while( pDest < &_edata ) *pDest++ = *pSrc++;
+
+    /* copy critical code to CCM SRAM
+     * to speed it up (no wait states)
+     */
+    pSrc  = &_siccmram;
+    pDest = &_sccmram;
+    while( pDest < &_eccmram) *pDest++ = *pSrc++;
+    /* TODO: lock the CCM Sram SYSCFG->RCR */
 
     /* This part of work usually is done in C library startup code.
      * Otherwise, define this macro to enable it in this startup.
@@ -288,8 +297,12 @@ void Reset_Handler(void) {
 #endif
 
     SystemInit();                             /* CMSIS System Initialization */
-    _start();                                 /* Enter PreeMain (C library entry point) */
+    //_start();                                 /* Enter PreeMain (C library entry point) */
+    __libc_init_array();
+    main();
+    while(1);
 }
+
 
 
 /*----------------------------------------------------------------------------

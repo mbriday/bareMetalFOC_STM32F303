@@ -44,6 +44,7 @@ include_directories(
 set(SYSTEMSRCS
     ${SYS_DIR}/startup_ARMCM4.c
     ${SYS_DIR}/startup_clock.c
+	${SYS_DIR}/syscall.c
 )
 
 #executable (should be after compile options)
@@ -66,7 +67,7 @@ target_link_libraries(${PROJECT_NAME}
 	${LINKER_FLAGS}
     m
     #-nostartfiles
-    #-nostdlib
+	#-nostdlib
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY LINK_DEPENDS ${LINKER_DIR}/${LINKER_SCRIPT})

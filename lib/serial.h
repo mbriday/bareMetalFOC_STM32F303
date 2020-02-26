@@ -3,7 +3,7 @@
 #include <string>
 #include <stdint.h>
 
-#define SERIAL_TX_BUFFER_SIZE 16
+#define SERIAL_TX_BUFFER_SIZE 32
 
 class serial
 {
