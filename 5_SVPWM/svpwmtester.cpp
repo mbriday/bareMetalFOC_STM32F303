@@ -3,6 +3,7 @@
 #include "stm32f3xx.h"
 #include "fixmath.h"
 #include "svpwm.h"
+#include "serial.h"
 
 svpwmTester::svpwmTester()
 {
@@ -13,13 +14,13 @@ svpwmTester::svpwmTester()
  * The initial goal is ~600 rpm, each degree.
  * => 600/60 = 10 round/s
  * => 10*360 => 3600 Hz
- * NOTE: 7 pole pair for the magnet => SPEED/7!
+ * NOTE: 7 pole pairs for the magnet => SPEED/7!
  * If we get PSC= 64-1  => 1us
  *           ARR= 278-1 => 3597Hz
 **/
 void svpwmTester::begin()
 {
-    mAmplitude = 100; //10%
+    mAmplitude = 300; //20%
 
     //start TIM6@3597 HZ
     //input clock = 64MHz.
@@ -65,6 +66,15 @@ uint32_t svpwmTester::getData()
     return ((uint32_t)mValpha)<<16U | ((uint32_t)mVbeta & 0xFFFF);
 }
 
+void svpwmTester::getTimings()
+{
+    Serial.printString("min: ");
+    Serial.printInt(Svpwm.getTimingMin());
+    Serial.printString(" - max: ");
+    Serial.printInt(Svpwm.getTimingMax());
+    Serial.printchar('\n');
+}
+
 /*
  * Test in debug mode:
  *  - ~110  us with soft float
@@ -81,10 +91,11 @@ uint32_t svpwmTester::getData()
 extern "C" void TIM6_DAC_IRQHandler() {
     static unsigned int degree = 0;
     //GPIOA->BSRR = 1 << 5;
-    degree = (degree+1) % 0x3FF; // modulo 1024
+    degree = (degree+1) & 0x3FF; // modulo 1024
     SvpwmTester.update(degree);
     //Svpwm.update(SvpwmTester.getData(),degree);
     Svpwm.update(SvpwmTester.getData());
+    if(degree == 0x3FF) SvpwmTester.getTimings();
     //GPIOA->BSRR = 1 << (5+16);
     TIM6->SR &= ~TIM_SR_UIF;	//acknowledge
 }

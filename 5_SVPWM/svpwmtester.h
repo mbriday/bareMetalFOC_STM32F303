@@ -32,6 +32,8 @@ public:
      * Vbeta  bits [15: 0]
      */
     uint32_t getData();
+
+    void getTimings();
 };
 
 extern svpwmTester SvpwmTester;

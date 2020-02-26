@@ -24,11 +24,18 @@
  */
 //#define DEBUG_SVPWM_SECTOR
 
+/* uncomment for timing analysis
+ * the 'update' time function is measured
+ */
+#define TIMINGS_SVPWM_UPDATE
+
 /* Space Vector PWM
  * First version: not optimized for speed!
  */
 class svpwm
 {
+    uint32_t m_timingMax; /*perf analysis only */
+    uint32_t m_timingMin; /*perf analysis only */
     /* store sqrt(3) as fix point 2.14
      * precision 1/16384 = 0,000061035
      * 0x6ED9 >> 14 = 1,731994629
@@ -36,6 +43,20 @@ class svpwm
      * error is 0.003%
      */
    static const int16_t sqrt3 = 0x6ED9;
+    /* store 2/sqrt(3) as fix point 1.15
+     * precision 1/32768 = 0,000030518
+     * 0x93CD >> 15 = 1,154693604
+     * 2/sqrt(3)    = 1,154700538
+     * error is 0.0006%
+     */
+    static const uint32_t twoDivSqrt3 = 0x93CD;
+    /* store 1/sqrt(3) as fix point 0.16
+     * precision 1/65536 = 0,000030518
+     * 0x93CD >> 16 = 0,577346802
+     * 1/sqrt(3)    = 0,577350269
+     * error is 0.0006%
+     */
+    const uint32_t oneDivSqrt3 = 0x93CD;
 public:
     svpwm();
     /* initialize the pwm, based on TIM1 */
@@ -57,6 +78,11 @@ public:
     #else
         void update(uint32_t ValphaBeta);
     #endif
+
+    /* get the maximum time measured. In TIM7 ticks */
+    uint32_t inline getTimingMax() {return m_timingMax;};
+    /* get the maximum time measured. In TIM7 ticks */
+    uint32_t inline getTimingMin() {return m_timingMin;};
 };
 
 extern svpwm Svpwm;
