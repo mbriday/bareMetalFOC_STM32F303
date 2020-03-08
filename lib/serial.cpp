@@ -37,6 +37,7 @@ serial::serial()
     USART2->CR3 = 0; //default
     USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
     NVIC_EnableIRQ(USART2_IRQn);
+    NVIC_SetPriority(USART2_IRQn,1);
 }
 
 extern "C" void USART2_IRQHandler()

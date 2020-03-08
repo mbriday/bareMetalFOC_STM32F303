@@ -57,6 +57,14 @@ unsigned char pinAlt(GPIO_TypeDef *port,
                      uint32_t numBit,
                      uint32_t AFId);
 
+/* Activate the analog mode for a pin
+ * Warning: it does not configure the ADC!
+ * \return
+ * - 0xFF in case of error (bad arguments)
+ * - 0 in case of success.
+ */
+unsigned char pinAnalog(GPIO_TypeDef *port, uint32_t numBit);
+
 #ifdef __cplusplus
   }
 #endif /* __cpusplus */

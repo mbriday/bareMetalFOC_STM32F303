@@ -117,3 +117,16 @@ unsigned char pinAlt(GPIO_TypeDef *port,
     port->AFR[AFRReg] |=  (AFId<<shift);
     return 0;
 }
+
+unsigned char pinAnalog(GPIO_TypeDef *port, uint32_t numBit)
+{
+    uint32_t mask2Bits; //mask for 2bit fields
+    if(!IS_GPIO_ALL_INSTANCE(port)) return 0xFF;
+    if(numBit > 15) return 0xFF;
+    //clock
+    clockForGpio(port);
+    port->MODER |= (3U<<(numBit*2));    //analog config
+    mask2Bits = (3U << (numBit*2));
+    port->PUPDR &= ~mask2Bits; //remove pull-up/down
+    return 0;
+}
