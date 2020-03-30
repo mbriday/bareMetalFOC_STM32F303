@@ -5,7 +5,7 @@ void clockForGpio(GPIO_TypeDef *port)
 {
     if(port == GPIOA)      RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	else if(port == GPIOB) RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	else if(port == GPIOC) RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+    else if(port == GPIOC) RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
 	else if(port == GPIOD) RCC->AHBENR |= RCC_AHBENR_GPIODEN;
 	//no GPIOE on stm303
 	//else if(port == GPIOE) RCC->AHBENR |= RCC_AHBENR_GPIOEEN; 
