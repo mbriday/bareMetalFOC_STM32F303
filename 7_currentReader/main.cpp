@@ -32,7 +32,7 @@ void configTIM1()
 
 extern "C" void TIM1_UP_TIM16_IRQHandler()
 {
-    uint16_t tmp;
+    uint16_t raw;
     GPIOC->BSRR = 1 << 10; //set PC10
     TIM1->SR &= ~TIM_SR_UIF;
     CurrentReader.waitADCResult();
@@ -41,20 +41,26 @@ extern "C" void TIM1_UP_TIM16_IRQHandler()
     asm("nop");
 
     Serial.printString("u: ");
-    tmp = CurrentReader.getRawU();
-    Serial.printInt(tmp);
+    raw = CurrentReader.getRawU();
+    Serial.printInt(raw);
     Serial.printString(" (");
-    Serial.printInt(CurrentReader.getCurrent(tmp)*1000);
+    Serial.printInt(CurrentReader.getCurrentFloat(raw)*1000);
+    Serial.printString(", ");
+    Serial.printInt(((CurrentReader.getCurrentU()>>10)*1000)>>20);
     Serial.printString(") v: ");
-    tmp = CurrentReader.getRawV();
-    Serial.printInt(tmp);
+    raw = CurrentReader.getRawV();
+    Serial.printInt(raw);
     Serial.printString(" (");
-    Serial.printInt(CurrentReader.getCurrent(tmp)*1000);
+    Serial.printInt(CurrentReader.getCurrentFloat(raw)*1000);
+    Serial.printString(", ");
+    Serial.printInt(((CurrentReader.getCurrentV()>>10)*1000)>>20);
     Serial.printString(") w: ");
-    tmp = CurrentReader.getRawW();
-    Serial.printInt(tmp);
+    raw = CurrentReader.getRawW();
+    Serial.printInt(raw);
     Serial.printString(" (");
-    Serial.printInt(CurrentReader.getCurrent(tmp)*1000);
+    Serial.printInt(CurrentReader.getCurrentFloat(raw)*1000);
+    Serial.printString(", ");
+    Serial.printInt(((CurrentReader.getCurrentW()>>10)*1000)>>20);
     Serial.printString(")\n");
 
     GPIOC->BSRR = 1 << (10+16); //reset PC10

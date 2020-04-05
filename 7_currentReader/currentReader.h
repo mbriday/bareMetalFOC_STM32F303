@@ -44,8 +44,21 @@ public:
     inline uint16_t getRawV() {return (uint16_t)(CURRENT_V_ADC->JDR1);};
     inline uint16_t getRawW() {return (uint16_t)(CURRENT_W_ADC->JDR1);};
 
-    /* get the current value from RAW ADC result */
-    float getCurrent(uint16_t raw);
+    /** get the current value from RAW ADC result */
+    float getCurrentFloat(uint16_t raw);
+
+    /** return the current in A, with a 2.30 encoded fixpoint value. phase U
+     * Note that the ADC should have finished its conversion (waitADCResult())
+     */
+    int32_t getCurrentU();
+    /** return the current in A, with a 2.30 encoded fixpoint value. phase V
+     * Note that the ADC should have finished its conversion (waitADCResult())
+     */
+    int32_t getCurrentV();
+    /** return the current in A, with a 2.30 encoded fixpoint value. phase W
+     * Note that the ADC should have finished its conversion (waitADCResult())
+     */
+    int32_t getCurrentW();
 };
 
 extern currentReader CurrentReader;

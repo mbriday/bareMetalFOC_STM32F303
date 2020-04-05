@@ -103,8 +103,31 @@ void currentReader::waitADCResult()
     CURRENT_W_ADC->ISR = ADC_ISR_JEOS;
 }
 
+int32_t currentReader::getCurrentU()
+{
+  const int32_t raw = CURRENT_U_ADC->JDR1;
+  //(1<<30)/1899 = 565424,8678
+  const int32_t result = (raw-1936)*565425;
+  return result;
+}
 
-float currentReader::getCurrent(uint16_t raw)
+int32_t currentReader::getCurrentV()
+{
+  const int32_t raw = CURRENT_V_ADC->JDR1;
+  //(1<<30)/1899 = 565424,8678
+  const int32_t result = (raw-1936)*565425;
+  return result;
+}
+
+int32_t currentReader::getCurrentW()
+{
+  const int32_t raw = CURRENT_W_ADC->JDR1;
+  //(1<<30)/1899 = 565424,8678
+  const int32_t result = (raw-1936)*565425;
+  return result;
+}
+
+float currentReader::getCurrentFloat(uint16_t raw)
 {
     //electronic interface gives:
     // gain       1.53
