@@ -17,12 +17,14 @@ encoder::encoder()
     pinAlt(GPIOA,0,1);
     pinAlt(GPIOB,3,1);
 
-    //input clock = 64MHz. Required?
+    //input clock = 72MHz. Required?
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    __asm("nop");
     //reset peripheral (mandatory!)
     RCC->APB1RSTR |=  RCC_APB1RSTR_TIM2RST;
     RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM2RST;
     __asm("nop");
+
     TIM2->CCMR1 |= 1U << TIM_CCMR1_CC1S_Pos; //Input Compare 1 on TI1
     TIM2->CCMR1 |= 1U << TIM_CCMR1_CC2S_Pos; //IC2 on TI2
     TIM2->CCER  |= TIM_CCER_CC1P;            //invert TIM2_CH1 polarity (sense)
