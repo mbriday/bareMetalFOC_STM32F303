@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fomit-frame-pointer -fno-strict
 add_compile_options(
     ${CPU_OPTIONS}
 	$<$<COMPILE_LANGUAGE:C>:-std=c11>
-	$<$<COMPILE_LANGUAGE:CXX>:-std=c++11>          #CMSYS do not support C++17
+	$<$<COMPILE_LANGUAGE:CXX>:-std=c++17>
     $<$<COMPILE_LANGUAGE:CXX>:-fms-extensions>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
@@ -22,7 +22,7 @@ add_compile_options(
     $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
     -fstrict-volatile-bitfields
     -ffunction-sections
-    -Werror
+	-Werror
     -Wall
     -Wextra
     -Wcast-align
@@ -38,7 +38,8 @@ add_compile_options(
 
 include_directories(
     ${CMSIS_DIR}/Device/ST/STM32F3xx/Include
-    ${CMSIS_DIR}/Include
+	${CMSIS_DIR}/DSP/Include
+	${CMSIS_DIR}/Core/Include
 )
 
 set(SYSTEMSRCS
