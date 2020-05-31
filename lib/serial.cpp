@@ -43,15 +43,17 @@ serial::serial()
 extern "C" void USART2_IRQHandler()
 {
     //interrupt updates m_txBufTail index!!
-
-    //only "TX Empty interrupt" is enabled
-    char c = Serial.m_txBuffer[Serial.m_txBufTail];
-    Serial.m_txBufTail = (Serial.m_txBufTail+1)%SERIAL_TX_BUFFER_SIZE;
-    if(Serial.m_txBufTail == Serial.m_txBufHead) { //empty
-        USART2->CR1 &= ~USART_CR1_TXEIE; //remove the interrupt.
+    if(USART2->ISR & USART_ISR_TXE)
+    {
+        //only "TX Empty interrupt" is enabled
+        char c = Serial.m_txBuffer[Serial.m_txBufTail];
+        Serial.m_txBufTail = (Serial.m_txBufTail+1)%SERIAL_TX_BUFFER_SIZE;
+        if(Serial.m_txBufTail == Serial.m_txBufHead) { //empty
+            USART2->CR1 &= ~USART_CR1_TXEIE; //remove the interrupt.
+        }
+        //send (and ack)
+        USART2->TDR = c;
     }
-    //send
-    USART2->TDR = c;
 }
 
 void serial::printchar(char c)
