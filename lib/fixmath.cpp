@@ -76,10 +76,10 @@ uint32_t sincos(int angle)
     const int d0 = sinTab[idx];
     const int d1 = sinTab[0xFF-idx];
     switch(part) {
-      case 0: return ( d0 << 16) | ( d1);            /*     0° to  90°   */
-      case 1: return ( d1 << 16) |((-d0) & 0xFFFF);  /*    90° to 180°   */
-      case 2: return (-d0 << 16) |((-d1) & 0xFFFF);  /*   180° to 270°   */
-      case 3: return (-d1 << 16) | ( d0);            /*   270° to 360°   */
+      case 0: return (  d0  << 16) | ( d1);            /*     0° to  90°   */
+      case 1: return (  d1  << 16) |((-d0) & 0xFFFF);  /*    90° to 180°   */
+      case 2: return ((-d0) << 16) |((-d1) & 0xFFFF);  /*   180° to 270°   */
+      case 3: return ((-d1) << 16) | ( d0);            /*   270° to 360°   */
       default: return 0;                 /* impossible state */
     }
 

@@ -93,7 +93,7 @@ void svpwm::disableOutputs()
 #ifdef DEBUG_SVPWM_SECTOR
 void svpwm::update(uint32_t ValphaBeta,unsigned int degree)
 #else
-//__attribute__((section ( ".ccmram" ))) /* set this critical function in CCM Sram (no wait state) */
+__attribute__((section ( ".ccmram" ))) /* set this critical function in CCM Sram (no wait state) */
 void svpwm::update(uint32_t ValphaBeta)
 #endif
 {
@@ -217,4 +217,3 @@ void svpwm::update(uint32_t ValphaBeta)
         if(sw < m_timingMin) m_timingMin = sw;
     #endif
 }
-

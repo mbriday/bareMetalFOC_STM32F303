@@ -27,7 +27,7 @@
 /* uncomment for timing analysis
  * the 'update' time function is measured
  */
-#define TIMINGS_SVPWM_UPDATE
+//#define TIMINGS_SVPWM_UPDATE
 
 /* Space Vector PWM
  * First version: not optimized for speed!

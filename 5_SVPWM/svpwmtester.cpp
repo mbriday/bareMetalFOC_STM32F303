@@ -30,7 +30,7 @@ void svpwmTester::begin()
     RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM6RST;
     asm("nop");
 
-    TIM6->PSC = 64-1;			    //prescaler  : tick@1us
+    TIM6->PSC = 72-1;			    //prescaler  : tick@1us
     TIM6->ARR = 278-1;				//auto-reload: counts 100 ticks
     TIM6->DIER |= TIM_DIER_UIE;		//interrupt enable
     TIM6->CR1  |= TIM_CR1_CEN;		//config reg : enable

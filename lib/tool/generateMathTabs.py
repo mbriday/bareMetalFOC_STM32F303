@@ -21,5 +21,5 @@ for idx in range (nbVal):
         if idx % nbDataPerLine == (nbDataPerLine-1):
             print('\n\t',end='')
     curVal += 1
-print('};')
+print('\n};')
 

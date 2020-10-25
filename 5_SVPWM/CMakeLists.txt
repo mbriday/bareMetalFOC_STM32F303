@@ -12,7 +12,6 @@ project(5_SVPWM)
 #application sources
 set(SRCS
 	    ${CMAKE_SOURCE_DIR}/main.cpp
-		${CMAKE_SOURCE_DIR}/svpwm.cpp
 		${CMAKE_SOURCE_DIR}/svpwmtester.cpp
 )
 
