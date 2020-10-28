@@ -15,10 +15,14 @@ extern "C" void __io_putchar(char c)
  * configuration 115200 8N1
  */
 
+
 serial::serial()
 {
     m_txBufHead = 0;
     m_txBufTail = 0;
+
+    m_rxBufHead = 0;
+    m_rxBufTail = 0;
 
     pinAlt(GPIOA,2,7); // PA2 (TX) => alternative config 7
     pinAlt(GPIOA,3,7); // PA3 (RX) => alternative config 7
@@ -35,17 +39,15 @@ serial::serial()
 
     USART2->CR2 = 0; //default
     USART2->CR3 = 0; //default
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_UE | USART_CR1_RXNEIE;
     NVIC_EnableIRQ(USART2_IRQn);
     NVIC_SetPriority(USART2_IRQn,1);
 }
 
 extern "C" void USART2_IRQHandler()
 {
-    //interrupt updates m_txBufTail index!!
-    if(USART2->ISR & USART_ISR_TXE)
+    if((USART2->ISR & USART_ISR_TXE) && (USART2->CR1 & USART_CR1_TXEIE))
     {
-        //only "TX Empty interrupt" is enabled
         char c = Serial.m_txBuffer[Serial.m_txBufTail];
         Serial.m_txBufTail = (Serial.m_txBufTail+1)%SERIAL_TX_BUFFER_SIZE;
         if(Serial.m_txBufTail == Serial.m_txBufHead) { //empty
@@ -54,15 +56,32 @@ extern "C" void USART2_IRQHandler()
         //send (and ack)
         USART2->TDR = c;
     }
+    if((USART2->ISR & USART_ISR_RXNE) && (USART2->CR1 & USART_CR1_RXNEIE))
+    {
+        const int next=(Serial.m_rxBufHead+1) % SERIAL_RX_BUFFER_SIZE;
+        if(next == Serial.m_rxBufTail) {
+            //buffer full => remove oldest data
+            Serial.m_rxBufTail = (Serial.m_rxBufTail+1) % SERIAL_RX_BUFFER_SIZE;
+        }
+        char c = USART2->RDR;
+        Serial.m_rxBuffer[Serial.m_rxBufHead] = c;
+        Serial.m_rxBufHead = next;
+    }
 }
 
 void serial::printchar(char c)
 {
+    volatile USART_TypeDef * __attribute__((unused)) usart=USART2;
     if(c == '\n') printchar('\r');   // newline should be preceeded by CR
 
     //routine updates m_txBufHead index
+    USART2->CR1 &= ~USART_CR1_TXEIE; //remove interrupt
     const int next=(m_txBufHead+1) % SERIAL_TX_BUFFER_SIZE;
-    while(next == m_txBufTail); //TX buffer full. Wait
+    if(next == m_txBufTail) //TX buffer full.
+    {
+        //remove oldest data
+        m_txBufTail = (m_txBufTail+1) & SERIAL_TX_BUFFER_SIZE;
+    }
     m_txBuffer[m_txBufHead] = c;
     m_txBufHead = next;
     USART2->CR1 |= USART_CR1_TXEIE; //TX empty interrupt
@@ -118,4 +137,17 @@ void serial::waitForTXComplete()
      * is empty.
      */
     while(USART2->CR1 & USART_CR1_TXEIE);
+}
+
+bool serial::readchar(char &c){
+    bool result = false;
+    volatile USART_TypeDef * __attribute__((unused)) usart=USART2;
+    if(m_rxBufTail != m_rxBufHead) { // not empty
+        USART2->CR1 &= ~USART_CR1_RXNEIE; //remove rx interrupt
+        c = m_rxBuffer[m_rxBufTail];
+        m_rxBufTail = (m_rxBufTail+1)%SERIAL_TX_BUFFER_SIZE;
+        result = true;
+        USART2->CR1 |= USART_CR1_RXNEIE; //set rx interrupt again
+    }
+    return result;
 }
