@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stm32f3xx.h": "c"
+    },
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/../sys/cmake/arm-none-eabi.cmake"
+    },
+    "cmake.configureOnOpen": false
+}
